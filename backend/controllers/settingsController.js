@@ -115,7 +115,22 @@ const resetPassword = async (req, res) => {
             });
         }
 
+        // Check if user has a password set
+        if (!user.isPasswordSet || !user.passwordHash) {
+            return res.status(400).json({
+                success: false,
+                message: 'User account has no password set. Please complete your account setup first or use forgot password to set a new password.'
+            });
+        }
+
         // Verify current password
+        console.log('Password reset attempt:', {
+            userId: user._id,
+            hasPasswordHash: !!user.passwordHash,
+            passwordHashLength: user.passwordHash?.length,
+            currentPasswordLength: currentPassword?.length
+        });
+
         const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.passwordHash);
         if (!isCurrentPasswordValid) {
             return res.status(400).json({

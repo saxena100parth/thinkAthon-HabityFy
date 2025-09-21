@@ -147,7 +147,14 @@ const Settings = () => {
                 setError(response.data.message || 'Failed to update password');
             }
         } catch (error) {
-            setError(error.response?.data?.message || 'Network error. Please try again.');
+            const errorMessage = error.response?.data?.message || 'Network error. Please try again.';
+
+            // Handle specific cases
+            if (errorMessage.includes('no password set') || errorMessage.includes('complete your account setup')) {
+                setError('Please complete your account setup first. You may need to verify your email or use the forgot password feature.');
+            } else {
+                setError(errorMessage);
+            }
         } finally {
             setLoading(false);
         }
@@ -330,6 +337,28 @@ const Settings = () => {
                         {activeTab === 'security' && (
                             <div>
                                 <h3 className="text-lg font-medium text-gray-900 mb-6">Change Password</h3>
+
+                                {/* Help message */}
+                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                                    <div className="flex">
+                                        <div className="flex-shrink-0">
+                                            <AlertCircle className="h-5 w-5 text-blue-400" />
+                                        </div>
+                                        <div className="ml-3">
+                                            <h3 className="text-sm font-medium text-blue-800">
+                                                Password Requirements
+                                            </h3>
+                                            <div className="mt-2 text-sm text-blue-700">
+                                                <p>To change your password, you must:</p>
+                                                <ul className="list-disc list-inside mt-1 space-y-1">
+                                                    <li>Have completed your account setup (email verification)</li>
+                                                    <li>Know your current password</li>
+                                                    <li>If you haven't set a password yet, use the "Forgot Password" feature</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 <form onSubmit={handlePasswordReset} className="space-y-6">
                                     <div className="space-y-4">

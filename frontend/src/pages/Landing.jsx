@@ -203,7 +203,7 @@ const Landing = () => {
                         </div>
                         <div className="mt-8 pt-8 border-t border-gray-800">
                             <p className="text-gray-400 text-sm">
-                                © 2024 HabityFy. All rights reserved.
+                                © 2025 HabityFy. All rights reserved.
                             </p>
                         </div>
                     </div>
