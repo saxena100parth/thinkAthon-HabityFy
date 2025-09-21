@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bell, Search, User, LogOut, Settings, ChevronDown, X } from 'lucide-react';
+import { Bell, Search, LogOut, ChevronDown, X } from 'lucide-react';
 import { useSearch } from '../../contexts/SearchContext';
 
 const TopNav = ({ user, unreadCount, onMenuClick, onLogout }) => {
@@ -104,14 +104,6 @@ const TopNav = ({ user, unreadCount, onMenuClick, onLogout }) => {
                                         <p className="text-sm font-medium text-gray-900">{user?.username}</p>
                                         <p className="text-xs text-gray-500">{user?.email}</p>
                                     </div>
-                                    <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                        <User className="mr-3 h-4 w-4" />
-                                        Profile
-                                    </button>
-                                    <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                        <Settings className="mr-3 h-4 w-4" />
-                                        Settings
-                                    </button>
                                     <button
                                         onClick={onLogout}
                                         className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
