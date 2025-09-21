@@ -3,8 +3,6 @@ import { Link } from 'react-router-dom';
 import {
     Home,
     Plus,
-    CheckCircle,
-    BarChart3,
     Bell,
     Settings,
     X,
@@ -16,43 +14,48 @@ import { useHabits } from '../../contexts/HabitContext';
 import { useNotifications } from '../../contexts/NotificationContext';
 
 const Sidebar = ({ onClose }) => {
-    const { getTodayCompletedHabits, getActiveHabits } = useHabits();
+    const { getActiveHabits, getTodayCompletedHabits } = useHabits();
     const { unreadCount } = useNotifications();
     const [showCreateHabit, setShowCreateHabit] = useState(false);
+    const [activeSection, setActiveSection] = useState('habits');
 
-    const todayCompleted = getTodayCompletedHabits();
     const activeHabits = getActiveHabits();
+    const todayCompleted = getTodayCompletedHabits();
 
     const menuItems = [
         {
             name: 'All Habits',
             icon: <Home className="w-5 h-5" />,
             count: activeHabits.length,
-            active: true
-        },
-        {
-            name: 'Completed Today',
-            icon: <CheckCircle className="w-5 h-5" />,
-            count: todayCompleted.length,
-            active: false
-        },
-        {
-            name: 'Statistics',
-            icon: <BarChart3 className="w-5 h-5" />,
-            count: null,
-            active: false
+            active: activeSection === 'habits',
+            onClick: () => {
+                setActiveSection('habits');
+                if (onClose) onClose();
+            }
         },
         {
             name: 'Notifications',
             icon: <Bell className="w-5 h-5" />,
             count: unreadCount,
-            active: false
+            active: activeSection === 'notifications',
+            onClick: () => {
+                setActiveSection('notifications');
+                if (onClose) onClose();
+                // Navigate to notifications page
+                window.location.href = '/notifications';
+            }
         },
         {
             name: 'Settings',
             icon: <Settings className="w-5 h-5" />,
             count: null,
-            active: false
+            active: activeSection === 'settings',
+            onClick: () => {
+                setActiveSection('settings');
+                if (onClose) onClose();
+                // Navigate to settings page
+                window.location.href = '/settings';
+            }
         }
     ];
 
@@ -74,9 +77,10 @@ const Sidebar = ({ onClose }) => {
                 {menuItems.map((item, index) => (
                     <button
                         key={index}
+                        onClick={item.onClick}
                         className={`w-full flex items-center justify-between px-4 py-3 rounded-lg text-left transition-colors ${item.active
-                                ? 'bg-red-50 text-red-700 border border-red-200'
-                                : 'text-gray-700 hover:bg-gray-100'
+                            ? 'bg-red-50 text-red-700 border border-red-200'
+                            : 'text-gray-700 hover:bg-gray-100'
                             }`}
                     >
                         <div className="flex items-center">

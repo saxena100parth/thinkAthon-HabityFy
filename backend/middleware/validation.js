@@ -96,6 +96,19 @@ const schemas = {
             'any.required': 'Scheduled time is required'
         }),
         habitId: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).optional()
+    }),
+
+    updateProfile: Joi.object({
+        username: Joi.string().min(3).max(30).optional(),
+        email: Joi.string().email().optional(),
+        mobile: Joi.string().pattern(/^\+?[1-9]\d{1,14}$/).optional().messages({
+            'string.pattern.base': 'Please provide a valid mobile number (e.g., +1234567890 or 1234567890)'
+        })
+    }),
+
+    resetUserPassword: Joi.object({
+        currentPassword: Joi.string().required(),
+        newPassword: Joi.string().min(6).required()
     })
 };
 

@@ -48,6 +48,32 @@ const masterHabitsData = [
         sortOrder: 3
     },
     {
+        title: "Weekly meal prep",
+        description: "Prepare healthy meals for the week ahead",
+        category: "health_fitness",
+        icon: "🍽️",
+        emoji: "🍽️",
+        suggestedFrequency: "weekly",
+        suggestedTimeOfDay: "10:00",
+        suggestedDuration: "2-3 hours",
+        difficulty: "medium",
+        tags: ["meal prep", "nutrition", "planning", "cooking"],
+        sortOrder: 4
+    },
+    {
+        title: "Weekly grocery shopping",
+        description: "Plan and shop for groceries for the week",
+        category: "health_fitness",
+        icon: "🛒",
+        emoji: "🛒",
+        suggestedFrequency: "weekly",
+        suggestedTimeOfDay: "09:00",
+        suggestedDuration: "1-2 hours",
+        difficulty: "easy",
+        tags: ["shopping", "nutrition", "planning", "errands"],
+        sortOrder: 5
+    },
+    {
         title: "Sleep 7-8 hours",
         description: "Get adequate sleep for optimal health and recovery",
         category: "health_fitness",
@@ -139,6 +165,32 @@ const masterHabitsData = [
         difficulty: "easy",
         tags: ["affirmations", "positive thinking", "confidence", "self-care"],
         sortOrder: 5
+    },
+    {
+        title: "Weekly therapy session",
+        description: "Attend your weekly therapy or counseling session",
+        category: "mental_wellbeing",
+        icon: "🛋️",
+        emoji: "🛋️",
+        suggestedFrequency: "weekly",
+        suggestedTimeOfDay: "14:00",
+        suggestedDuration: "50-60 min",
+        difficulty: "medium",
+        tags: ["therapy", "mental health", "counseling", "self-care"],
+        sortOrder: 6
+    },
+    {
+        title: "Weekly digital detox",
+        description: "Take a break from all digital devices for a few hours",
+        category: "mental_wellbeing",
+        icon: "📱",
+        emoji: "📱",
+        suggestedFrequency: "weekly",
+        suggestedTimeOfDay: "10:00",
+        suggestedDuration: "2-4 hours",
+        difficulty: "hard",
+        tags: ["digital detox", "mindfulness", "break", "unplug"],
+        sortOrder: 7
     },
 
     // Learning & Growth

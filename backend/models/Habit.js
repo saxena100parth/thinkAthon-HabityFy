@@ -140,6 +140,114 @@ habitSchema.methods.toggleCompletion = function () {
     return this.save();
 };
 
+// Method to get week start date (Monday)
+habitSchema.methods.getWeekStart = function (date) {
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
+    return new Date(d.setDate(diff)).toISOString().split('T')[0];
+};
+
+// Method to check if habit is completed for the week
+habitSchema.methods.isCompletedForWeek = function (date) {
+    const weekStart = this.getWeekStart(date);
+    const weekEnd = new Date(new Date(weekStart).getTime() + 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+    return this.history.some(entry => {
+        const entryDate = entry.date;
+        return entryDate >= weekStart && entryDate <= weekEnd && entry.completed;
+    });
+};
+
+// Method to toggle weekly habit completion
+habitSchema.methods.toggleWeeklyCompletion = function (date) {
+    const weekStart = this.getWeekStart(date);
+    const weekEnd = new Date(new Date(weekStart).getTime() + 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+    // Check if already completed this week
+    const isCompleted = this.isCompletedForWeek(date);
+
+    if (isCompleted) {
+        // Remove all completions for this week
+        this.history = this.history.filter(entry => {
+            const entryDate = entry.date;
+            return !(entryDate >= weekStart && entryDate <= weekEnd && entry.completed);
+        });
+    } else {
+        // Add completion for the specified date
+        const targetDate = new Date(date).toISOString().split('T')[0];
+        const existingEntry = this.history.find(entry => entry.date === targetDate);
+
+        if (existingEntry) {
+            existingEntry.completed = true;
+            existingEntry.completedAt = new Date();
+        } else {
+            this.history.push({
+                date: targetDate,
+                completed: true,
+                completedAt: new Date()
+            });
+        }
+    }
+
+    // Update streaks for weekly habits
+    this.updateWeeklyStreaks();
+    return this.save();
+};
+
+// Method to update streaks for weekly habits
+habitSchema.methods.updateWeeklyStreaks = function () {
+    const sortedHistory = this.history
+        .filter(entry => entry.completed)
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    let currentStreak = 0;
+    let maxStreak = 0;
+    let tempStreak = 0;
+
+    // Group completions by week
+    const weeklyCompletions = new Map();
+
+    sortedHistory.forEach(entry => {
+        const weekStart = this.getWeekStart(entry.date);
+        if (!weeklyCompletions.has(weekStart)) {
+            weeklyCompletions.set(weekStart, false);
+        }
+        weeklyCompletions.set(weekStart, true);
+    });
+
+    // Calculate streaks based on weekly completions
+    const weeks = Array.from(weeklyCompletions.keys()).sort();
+    const today = new Date();
+    const currentWeekStart = this.getWeekStart(today);
+
+    // Calculate current streak (consecutive weeks from current week backwards)
+    let checkWeek = new Date(currentWeekStart);
+    for (let i = 0; i < 52; i++) { // Check last 52 weeks
+        const weekStartStr = checkWeek.toISOString().split('T')[0];
+        if (weeklyCompletions.get(weekStartStr)) {
+            currentStreak++;
+        } else {
+            break;
+        }
+        checkWeek.setDate(checkWeek.getDate() - 7);
+    }
+
+    // Calculate max streak
+    tempStreak = 0;
+    weeks.forEach(weekStart => {
+        if (weeklyCompletions.get(weekStart)) {
+            tempStreak++;
+            maxStreak = Math.max(maxStreak, tempStreak);
+        } else {
+            tempStreak = 0;
+        }
+    });
+
+    this.currentStreak = currentStreak;
+    this.maxStreak = maxStreak;
+};
+
 // Method to update current and max streaks
 habitSchema.methods.updateStreaks = function () {
     const sortedHistory = this.history

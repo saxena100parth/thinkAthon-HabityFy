@@ -8,6 +8,11 @@ const {
     resetPassword,
     getProfile
 } = require('../controllers/authController');
+const {
+    updateProfile,
+    resetPassword: resetUserPassword,
+    deleteAccount
+} = require('../controllers/settingsController');
 const { validate, schemas } = require('../middleware/validation');
 const { protect } = require('../middleware/auth');
 
@@ -18,5 +23,10 @@ router.post('/login', validate(schemas.login), login);
 router.post('/forgot-password', validate(schemas.forgotPassword), forgotPassword);
 router.post('/reset-password', validate(schemas.resetPassword), resetPassword);
 router.get('/me', protect, getProfile);
+
+// Settings routes (protected)
+router.put('/profile', protect, validate(schemas.updateProfile), updateProfile);
+router.put('/change-password', protect, validate(schemas.resetUserPassword), resetUserPassword);
+router.delete('/delete-account', protect, deleteAccount);
 
 module.exports = router;

@@ -34,9 +34,26 @@ const getHabits = async (req, res) => {
             const targetDate = new Date(date).toISOString().split('T')[0];
             const habitsWithDateStatus = habits.map(habit => {
                 const habitObj = habit.toObject();
-                const dateEntry = habit.history.find(entry => entry.date === targetDate);
-                habitObj.completedForDate = dateEntry ? dateEntry.completed : false;
-                habitObj.completedAtForDate = dateEntry ? dateEntry.completedAt : null;
+
+                if (habit.frequency === 'weekly') {
+                    // For weekly habits, check if completed for the week
+                    habitObj.completedForDate = habit.isCompletedForWeek(targetDate);
+                    // Find the completion date for this week
+                    const weekStart = habit.getWeekStart(targetDate);
+                    const weekEnd = new Date(new Date(weekStart).getTime() + 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+                    const weekEntry = habit.history.find(entry => {
+                        const entryDate = entry.date;
+                        return entryDate >= weekStart && entryDate <= weekEnd && entry.completed;
+                    });
+                    habitObj.completedAtForDate = weekEntry ? weekEntry.completedAt : null;
+                    habitObj.isWeeklyCompleted = habitObj.completedForDate;
+                } else {
+                    // For daily habits, check specific date
+                    const dateEntry = habit.history.find(entry => entry.date === targetDate);
+                    habitObj.completedForDate = dateEntry ? dateEntry.completed : false;
+                    habitObj.completedAtForDate = dateEntry ? dateEntry.completedAt : null;
+                }
+
                 return habitObj;
             });
 
@@ -304,25 +321,44 @@ const toggleHabit = async (req, res) => {
             });
         }
 
-        // Find or create entry for the target date
-        let dateEntry = habit.history.find(entry => entry.date === targetDate);
-
-        if (dateEntry) {
-            // Toggle existing entry
-            dateEntry.completed = !dateEntry.completed;
-            dateEntry.completedAt = dateEntry.completed ? new Date() : null;
+        // Handle different frequency types
+        if (habit.frequency === 'weekly') {
+            // For weekly habits, use weekly completion logic
+            await habit.toggleWeeklyCompletion(targetDate);
         } else {
-            // Create new entry for the target date
-            habit.history.push({
-                date: targetDate,
-                completed: true,
-                completedAt: new Date()
-            });
+            // For daily habits, use regular completion logic
+            let dateEntry = habit.history.find(entry => entry.date === targetDate);
+
+            if (dateEntry) {
+                // Toggle existing entry
+                dateEntry.completed = !dateEntry.completed;
+                dateEntry.completedAt = dateEntry.completed ? new Date() : null;
+            } else {
+                // Create new entry for the target date
+                habit.history.push({
+                    date: targetDate,
+                    completed: true,
+                    completedAt: new Date()
+                });
+            }
+
+            // Update streaks
+            habit.updateStreaks();
+            await habit.save();
         }
 
-        // Update streaks
-        habit.updateStreaks();
-        await habit.save();
+        // Create completion notification
+        const isCompleted = habit.frequency === 'weekly' ?
+            habit.isCompletedForWeek(targetDate) :
+            habit.history.find(entry => entry.date === targetDate)?.completed;
+
+        if (isCompleted) {
+            await Notification.createAchievement(
+                req.user._id,
+                `✅ Great job! You completed "${habit.title}"!`,
+                habit._id
+            );
+        }
 
         // Check for achievements
         if (habit.currentStreak > 0 && habit.currentStreak % 7 === 0) {
@@ -333,17 +369,38 @@ const toggleHabit = async (req, res) => {
             );
         }
 
+        // Get completion status for the response
+        let completedForDate, completedAtForDate;
+
+        if (habit.frequency === 'weekly') {
+            completedForDate = habit.isCompletedForWeek(targetDate);
+            // Find the completion date for this week
+            const weekStart = habit.getWeekStart(targetDate);
+            const weekEnd = new Date(new Date(weekStart).getTime() + 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+            const weekEntry = habit.history.find(entry => {
+                const entryDate = entry.date;
+                return entryDate >= weekStart && entryDate <= weekEnd && entry.completed;
+            });
+            completedAtForDate = weekEntry ? weekEntry.completedAt : null;
+        } else {
+            const dateEntry = habit.history.find(entry => entry.date === targetDate);
+            completedForDate = dateEntry ? dateEntry.completed : true;
+            completedAtForDate = dateEntry ? dateEntry.completedAt : new Date();
+        }
+
         res.json({
             success: true,
-            message: `Habit ${dateEntry?.completed ? 'completed' : 'uncompleted'} for ${targetDate}`,
+            message: `Habit ${completedForDate ? 'completed' : 'uncompleted'} for ${targetDate}`,
             habit: {
                 id: habit._id,
                 title: habit.title,
+                frequency: habit.frequency,
                 currentStreak: habit.currentStreak,
                 maxStreak: habit.maxStreak,
-                completedForDate: dateEntry ? dateEntry.completed : true,
-                completedAtForDate: dateEntry ? dateEntry.completedAt : new Date(),
-                targetDate
+                completedForDate,
+                completedAtForDate,
+                targetDate,
+                isWeeklyCompleted: habit.frequency === 'weekly' ? completedForDate : undefined
             }
         });
     } catch (error) {

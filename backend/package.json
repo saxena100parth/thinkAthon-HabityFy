@@ -8,6 +8,7 @@
     "dev": "nodemon server.js",
     "seed": "node scripts/seed.js",
     "seed-master-habits": "node scripts/seedMasterHabits.js",
+    "create-sample-notifications": "node scripts/createSampleNotifications.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

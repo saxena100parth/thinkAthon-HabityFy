@@ -2,15 +2,16 @@ import { useState, useEffect } from 'react';
 import { Plus, Filter, Search, MoreVertical, Edit, Trash2, CheckCircle, Clock, Calendar } from 'lucide-react';
 import { useHabits } from '../../contexts/HabitContext';
 import { useMasterHabits } from '../../contexts/MasterHabitContext';
+import { useSearch } from '../../contexts/SearchContext';
 import HabitCard from '../ui/HabitCard';
 import MasterHabitSelector from '../ui/MasterHabitSelector';
 import DatePicker from '../ui/DatePicker';
 
 const HabitsSection = ({ habits }) => {
     const { createHabit, updateHabit, deleteHabit, toggleHabit, getHabitsForDate } = useHabits();
+    const { searchTerm, searchResults, getSearchStats } = useSearch();
     const [showMasterHabitSelector, setShowMasterHabitSelector] = useState(false);
     const [filter, setFilter] = useState('all');
-    const [searchTerm, setSearchTerm] = useState('');
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
     const [dateFilteredHabits, setDateFilteredHabits] = useState(habits);
     const [isLoadingDate, setIsLoadingDate] = useState(false);
@@ -42,25 +43,25 @@ const HabitsSection = ({ habits }) => {
         setDateFilteredHabits(habits);
     }, [habits]);
 
-    const filteredHabits = dateFilteredHabits.filter(habit => {
-        const matchesSearch = habit.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            habit.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    // Use search results if there's a search term, otherwise use dateFilteredHabits
+    const habitsToFilter = searchTerm ? searchResults : dateFilteredHabits;
 
+    const filteredHabits = habitsToFilter.filter(habit => {
         switch (filter) {
             case 'completed':
-                return matchesSearch && (habit.completedForDate || habit.history?.find(h =>
+                return habit.completedForDate || habit.history?.find(h =>
                     h.date === selectedDate
-                )?.completed);
+                )?.completed;
             case 'pending':
-                return matchesSearch && !(habit.completedForDate || habit.history?.find(h =>
+                return !(habit.completedForDate || habit.history?.find(h =>
                     h.date === selectedDate
                 )?.completed);
             case 'active':
-                return matchesSearch && habit.isActive;
+                return habit.isActive;
             case 'inactive':
-                return matchesSearch && !habit.isActive;
+                return !habit.isActive;
             default:
-                return matchesSearch;
+                return true;
         }
     });
 
@@ -126,19 +127,26 @@ const HabitsSection = ({ habits }) => {
                 </div>
             </div>
 
-            {/* Filters and Search */}
+            {/* Filters and Search Status */}
             <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1">
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                        <input
-                            type="text"
-                            placeholder="Search habits..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                        />
-                    </div>
+                    {searchTerm ? (
+                        <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                            <Search className="h-5 w-5 text-red-600" />
+                            <div className="flex-1">
+                                <p className="text-sm font-medium text-red-900">
+                                    Searching for "{searchTerm}"
+                                </p>
+                                <p className="text-xs text-red-600">
+                                    {getSearchStats().found} of {getSearchStats().total} habits found
+                                </p>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="text-sm text-gray-500 p-3">
+                            Use the search bar above to find specific habits
+                        </div>
+                    )}
                 </div>
                 <div className="flex gap-2">
                     <select

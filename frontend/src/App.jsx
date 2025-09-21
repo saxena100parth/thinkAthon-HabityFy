@@ -7,10 +7,15 @@ import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
+import Notifications from './pages/Notifications';
+import Settings from './pages/Settings';
+import TestPage from './pages/TestPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { HabitProvider } from './contexts/HabitContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { MasterHabitProvider } from './contexts/MasterHabitContext';
+import { SearchProvider } from './contexts/SearchContext';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
@@ -50,37 +55,52 @@ const PublicRoute = ({ children }) => {
 
 function App() {
   return (
-    <AuthProvider>
-      <MasterHabitProvider>
-        <HabitProvider>
-          <NotificationProvider>
-            <Router>
-              <div className="App min-h-screen bg-gray-50">
-                <Routes>
-                  {/* Public Routes */}
-                  <Route path="/" element={<Landing />} />
-                  <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
-                  <Route path="/verify-otp" element={<PublicRoute><VerifyOTP /></PublicRoute>} />
-                  <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
-                  <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
-                  <Route path="/reset-password" element={<PublicRoute><ResetPassword /></PublicRoute>} />
+    <ErrorBoundary>
+      <AuthProvider>
+        <MasterHabitProvider>
+          <HabitProvider>
+            <NotificationProvider>
+              <SearchProvider>
+                <Router>
+                  <div className="App min-h-screen bg-gray-50">
+                    <Routes>
+                      {/* Public Routes */}
+                      <Route path="/" element={<Landing />} />
+                      <Route path="/test" element={<TestPage />} />
+                      <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
+                      <Route path="/verify-otp" element={<PublicRoute><VerifyOTP /></PublicRoute>} />
+                      <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+                      <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
+                      <Route path="/reset-password" element={<PublicRoute><ResetPassword /></PublicRoute>} />
 
-                  {/* Protected Routes */}
-                  <Route path="/dashboard" element={
-                    <ProtectedRoute>
-                      <Dashboard />
-                    </ProtectedRoute>
-                  } />
+                      {/* Protected Routes */}
+                      <Route path="/dashboard" element={
+                        <ProtectedRoute>
+                          <Dashboard />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/notifications" element={
+                        <ProtectedRoute>
+                          <Notifications />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/settings" element={
+                        <ProtectedRoute>
+                          <Settings />
+                        </ProtectedRoute>
+                      } />
 
-                  {/* Catch all route */}
-                  <Route path="*" element={<Navigate to="/" />} />
-                </Routes>
-              </div>
-            </Router>
-          </NotificationProvider>
-        </HabitProvider>
-      </MasterHabitProvider>
-    </AuthProvider>
+                      {/* Catch all route */}
+                      <Route path="*" element={<Navigate to="/" />} />
+                    </Routes>
+                  </div>
+                </Router>
+              </SearchProvider>
+            </NotificationProvider>
+          </HabitProvider>
+        </MasterHabitProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 

@@ -110,6 +110,11 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const updateUser = (userData) => {
+        setUser(userData);
+        localStorage.setItem('user', JSON.stringify(userData));
+    };
+
     const logout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
@@ -124,6 +129,7 @@ export const AuthProvider = ({ children }) => {
         verifyOTP,
         forgotPassword,
         resetPassword,
+        updateUser,
         logout,
     };
 

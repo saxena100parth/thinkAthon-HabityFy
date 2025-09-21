@@ -54,6 +54,9 @@ export const authAPI = {
     forgotPassword: (email) => API.post('/auth/forgot-password', { email }),
     resetPassword: (resetData) => API.post('/auth/reset-password', resetData),
     getProfile: () => API.get('/auth/me'),
+    updateProfile: (profileData) => API.put('/auth/profile', profileData),
+    resetUserPassword: (passwordData) => API.put('/auth/change-password', passwordData),
+    deleteAccount: () => API.delete('/auth/delete-account'),
 };
 
 // Habits API calls
