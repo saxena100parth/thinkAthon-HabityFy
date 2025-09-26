@@ -9,6 +9,7 @@ import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
 import Notifications from './pages/Notifications';
 import Settings from './pages/Settings';
+import DietChart from './pages/DietChart';
 import TestPage from './pages/TestPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { HabitProvider } from './contexts/HabitContext';
@@ -87,6 +88,11 @@ function App() {
                       <Route path="/settings" element={
                         <ProtectedRoute>
                           <Settings />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/diet-chart" element={
+                        <ProtectedRoute>
+                          <DietChart />
                         </ProtectedRoute>
                       } />
 

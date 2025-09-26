@@ -8,7 +8,8 @@ import {
     X,
     Target,
     Calendar,
-    TrendingUp
+    TrendingUp,
+    Utensils
 } from 'lucide-react';
 import { useHabits } from '../../contexts/HabitContext';
 import { useNotifications } from '../../contexts/NotificationContext';
@@ -55,6 +56,18 @@ const Sidebar = ({ onClose }) => {
                 if (onClose) onClose();
                 // Navigate to settings page
                 window.location.href = '/settings';
+            }
+        },
+        {
+            name: 'Diet Chart',
+            icon: <Utensils className="w-5 h-5" />,
+            count: null,
+            active: activeSection === 'diet-chart',
+            onClick: () => {
+                setActiveSection('diet-chart');
+                if (onClose) onClose();
+                // Navigate to diet chart page
+                window.location.href = '/diet-chart';
             }
         }
     ];
