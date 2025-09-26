@@ -107,7 +107,7 @@ HabityFy/
    ```env
    NODE_ENV=development
    PORT=5000
-   MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/habityfy
+   MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/HabityFy
    JWT_SECRET=your-super-secret-jwt-key
    EMAIL_HOST=smtp.gmail.com
    EMAIL_PORT=587
@@ -309,7 +309,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-For support, email support@habityfy.com or create an issue in the repository.
+For support, email support@HabityFy.com or create an issue in the repository.
 
 ## 🎯 Roadmap
 

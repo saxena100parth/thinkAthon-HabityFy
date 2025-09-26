@@ -209,8 +209,8 @@ const VerifyOTP = () => {
                                 type="submit"
                                 disabled={isLoading}
                                 className={`w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white ${isLoading
-                                        ? 'bg-red-400 cursor-not-allowed'
-                                        : 'bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500'
+                                    ? 'bg-red-400 cursor-not-allowed'
+                                    : 'bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500'
                                     } transition-colors duration-200`}
                             >
                                 {isLoading ? (
